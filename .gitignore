@@ -1,3 +1,10 @@
+# Tunable settings files
+/settings.yaml
+input/markdown/*
+cache/*
+output/*
+tickers/*
+
 # Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
