@@ -1,3 +1,7 @@
+# Multi Agent System for Building Stock Portfolios
+
+Took inspiration from [this repository](https://github.com/karthik-codex/Autogen_GraphRAG_Ollama) for project structure.
+
 ## Installation and Setup Mac
 
 Follow these steps to set up and run AutoGen GraphRAG Local with Ollama and Chainlit UI:
