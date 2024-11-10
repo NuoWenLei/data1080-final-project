@@ -27,16 +27,22 @@ Follow these steps to set up and run AutoGen GraphRAG Local with Ollama and Chai
 
    ```bash
    mkdir -p ./input
-   python -m graphrag init  --root .
-   mv ./utils/settings.yaml ./
+   python -m graphrag init --root .
+   cp ./utils/settings.yaml ./
    ```
 
-4. **Replace 'embedding.py' in the GraphRAG package folder using files from Utils folder:**
+4. **Replace 'embedding.py' and 'openai_embeddings_llm.py' in the GraphRAG package folder using files from Utils folder:**
 
    Path example: ~/anaconda3/envs/rag_env/lib/python3.12/site-packages/graphrag/query/llm/oai/embedding.py
 
    ```bash
-   cp ./utils/embedding.py ~/path/to/graphrag/
+   cp ./utils/embedding.py ~/path/to/graphrag/query/llm/oai/
+   ```
+
+   Path example: ~/anaconda3/envs/rag_env/lib/python3.12/site-packages/graphrag/llm/openai/openai_embeddings_llm.py
+
+   ```bash
+   cp ./utils/openai_embeddings_llm.py ~/path/to/graphrag/llm/openai/
    ```
 
 5. **Get Financial Data**

@@ -1,4 +1,5 @@
 # Tunable settings files
+logs/*
 /settings.yaml
 input/markdown/*
 cache/*
