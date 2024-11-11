@@ -46,6 +46,7 @@ def get_ticker_info(symbol: str):
 	metadataAttributes = [
 		"industry",
 		"sector",
+		"longBusinessSummary",
 		"country",
 	]
 	numericAttributes = ['auditRisk', 'boardRisk', 'compensationRisk', 'shareHolderRightsRisk',
@@ -90,6 +91,7 @@ def collect_deloitte():
 		elements = soup.find(class_="responsivegrid content-width-di-sm aem-GridColumn aem-GridColumn--default--8").find_all(["h1", "h2", "h3", "li", "p"])
 		html_str = "".join([str(e) for e in elements])
 		return md(html_str, strip=["a"])
+	
 	year = datetime.datetime.now().year
 	prevMonth = datetime.datetime.now().month - 1
 	prevUrl = f"https://www2.deloitte.com/us/en/insights/economy/global-economic-outlook/weekly-update/weekly-update-{year}-{prevMonth}.html"

@@ -48,6 +48,8 @@ Follow these steps to set up and run AutoGen GraphRAG Local with Ollama and Chai
 5. **Get Financial Data**
 
    ```bash
+   mkdir ./tickers
+   mv tickers.json ./tickers/
    python collect_data.py
    ```
 
