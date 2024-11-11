@@ -122,10 +122,12 @@ def collect_ticker_data():
 	metadatas = []
 	numerics = []
 	symbols = []
+	summaries = []
 	for ticker in tqdm(tickers):
 		try:
 			symbol = ticker["symbol"]
 			m, n = get_ticker_info(symbol)
+			summaries.append((symbol, m["long business summary"]))
 			m["name"] = ticker["name"]
 			m["symbol"] = symbol
 			metadatas.append(m)
@@ -147,6 +149,10 @@ def collect_ticker_data():
 
 	with open("tickers/weighable_attributes.json", "w") as attr_json:
 		json.dump(weighable_attributes.tolist(), attr_json)
+	
+	for symbol, summary in summaries:
+		with open(f"markdown_{symbol}.md", "w") as symbol_json:
+			symbol_json.write(summary)
 		
 def clean_attributes(numerics, metadata, symbols) -> tuple[pd.DataFrame, pd.DataFrame, np.ndarray]:
 	numeric_df = pd.DataFrame(numerics, index = symbols)
