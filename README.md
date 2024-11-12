@@ -62,18 +62,26 @@ Follow these steps to set up and run AutoGen GraphRAG Local with Ollama and Chai
    GRAPHRAG_API_KEY=<API_KEY>
    ```
 
-7. **Create embeddings and knowledge graph:**
+7. **Reload your environmental variables**
+
+   Close and reopen your terminal, then run the following in your terminal to confirm that your `.env` file is properly loaded.
+
+   ```bash
+   echo $GRAPHRAG_API_KEY
+   ```
+
+8. **Create embeddings and knowledge graph:**
    ```bash
    python -m graphrag index --root .
    ```
-8. **Start Lite-LLM proxy server:**
+9. **Start Lite-LLM proxy server:**
    ```bash
    litellm --model ollama_chat/llama3
    ```
-9. **Run app:**
-   ```bash
-   chainlit run appUI.py
-   ```
+10. **Run app:**
+    ```bash
+    chainlit run appUI.py
+    ```
 
 ## For Jupyter Notebook Support
 

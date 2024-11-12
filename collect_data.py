@@ -84,14 +84,19 @@ def get_ticker_info(symbol: str):
 	
 	return tickerMetadata, tickerNumerics
 
+def process_elements(elems):
+	text = ""
+	for elem in elems:
+		text += elem.text.strip() + "\n"
+	return text
+
 def collect_deloitte():
 	def collect_webpage(url):
 		r = requests.get(url)
 		soup = BeautifulSoup(r.text, "html.parser")
 		elements = soup.find(class_="responsivegrid content-width-di-sm aem-GridColumn aem-GridColumn--default--8").find_all(["h1", "h2", "h3", "li", "p"])
-		html_str = "".join([str(e) for e in elements])
-		return md(html_str, strip=["a"])
-	
+		return process_elements(elements)
+		
 	year = datetime.datetime.now().year
 	prevMonth = datetime.datetime.now().month - 1
 	prevUrl = f"https://www2.deloitte.com/us/en/insights/economy/global-economic-outlook/weekly-update/weekly-update-{year}-{prevMonth}.html"
@@ -103,14 +108,96 @@ def collect_deloitte():
 		except Exception as e:
 			pass
 	return docs
+
+def collect_motley_sectors():
+	docs = []
+	sector_articles = [
+    "https://www.fool.com/investing/stock-market/market-sectors/",
+    "https://www.fool.com/investing/stock-market/market-sectors/materials/",
+    "https://www.fool.com/investing/stock-market/market-sectors/industrials/",
+    "https://www.fool.com/investing/stock-market/market-sectors/consumer-staples/",
+    "https://www.fool.com/investing/stock-market/market-sectors/information-technology/",
+    "https://www.fool.com/investing/stock-market/market-sectors/real-estate-investing/",
+    "https://www.fool.com/investing/stock-market/market-sectors/energy/",
+    "https://www.fool.com/investing/stock-market/market-sectors/healthcare/"
+	]
+	for url in tqdm(sector_articles):
+		r = requests.get(url)
+		soup = BeautifulSoup(r.text, "html.parser")
+		paragraphs = [p.text for p in soup.find("div",
+																class_="max-w-full w-full mx-auto article-body"
+																).find_all("p")]
+
+		key_points = [filter(lambda x : x.text.strip() != "",
+												point.contents).__next__().text.strip()
+									for point in soup.find("div", class_="mt-8 bg-white shadow-card p-20px").find("ul").find_all("li")]
+		content = "\n".join(key_points + paragraphs)
+		docs.append(content)
+	return docs
+
+def collect_motley_fools():
+	headers = {
+    "X-Requested-With": "fetch"
+	}
+	num_pages = 4
+	articles = []
+	for p in range(num_pages):
+			print(f"Page {p}")
+			fool_url = f"https://www.fool.com/market-trends/filtered_articles_by_page/?page={p}"
+			r = requests.get(fool_url, headers=headers)
+			html = json.loads(r.text)
+			soup = BeautifulSoup(html['html'], "html.parser")
+			articles_raw = soup.find_all("div", class_="flex py-12px text-gray-1100")
+			
+			for art in tqdm(articles_raw):
+					article = dict()
+					
+					date_str = art.find("div", class_="text-sm text-gray-800 mb-2px md:mb-8px").text.split("by")[0].strip()
+					post_date = datetime.datetime.strptime(date_str, "%b %d, %Y")
+					article["date"] = post_date
+
+					title = art.find("h5", class_="self-center mb-6 font-medium md:text-h5 text-md md:mb-4px").text.strip()
+					article["title"] = title
+
+					link = "https://www.fool.com" + art.find("a")['href']
+					article["link"] = link
+
+					articles.append(article)
 	
+	documents = []
+	for article in tqdm(articles):
+		try:
+			r = requests.get(article["link"])
+			soup = BeautifulSoup(r.text, "html.parser")
+			paragraphs = [p.text for p in soup.find("section",
+																						class_="container mx-auto bg-white px-24px md:px-40 pt-36px sm:pt-16px md:pt-16px md:pb-8"
+																						).find_all("p")]
+			
+			key_points = [point.find_all("div")[-1].text for point in soup.find("div", class_="mt-8 bg-white shadow-card p-20px").find("ul").find_all("li")]
+			content = "\n".join(key_points + paragraphs)
+			documents.append(content)
+		except Exception as e:
+			print("Motley Fool Document Parsing Failed")
+			print(e)
+	
+	return documents
 
 def collect_news():
 	documents = []
+	sources = [
+		# Motley Fools with sector definitions and recommendations
+		collect_motley_sectors,
 
-	# Deloitte covers global trends
-	deloitte_docs = collect_deloitte()
-	documents.extend(deloitte_docs)
+		# Motley Fools covers market trends
+		collect_motley_fools,
+
+		# Deloitte covers global trends
+		collect_deloitte
+	]
+
+	for i, source in enumerate(sources):
+		print(f"Source {i}")
+		documents.extend(source())
 
 	for i, doc in enumerate(documents):
 		with open(f"input/markdown/markdown_{i}.md", "w") as md_txt:
@@ -150,9 +237,9 @@ def collect_ticker_data():
 	with open("tickers/weighable_attributes.json", "w") as attr_json:
 		json.dump(weighable_attributes.tolist(), attr_json)
 	
-	for symbol, summary in summaries:
-		with open(f"markdown_{symbol}.md", "w") as symbol_json:
-			symbol_json.write(summary)
+	# for symbol, summary in summaries:
+	# 	with open(f"input/markdown/summaries/markdown_{symbol}.md", "w") as symbol_json:
+	# 		symbol_json.write(summary)
 		
 def clean_attributes(numerics, metadata, symbols) -> tuple[pd.DataFrame, pd.DataFrame, np.ndarray]:
 	numeric_df = pd.DataFrame(numerics, index = symbols)
@@ -173,6 +260,8 @@ def clean_attributes(numerics, metadata, symbols) -> tuple[pd.DataFrame, pd.Data
 	return numeric_df, meta_df, weighable_attributes
 
 if __name__ == "__main__":
+	print("Collecting Stock Data")
 	collect_ticker_data()
+	print("Collecting News")
 	collect_news()
 
