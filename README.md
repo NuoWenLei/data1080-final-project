@@ -71,17 +71,27 @@ Follow these steps to set up and run AutoGen GraphRAG Local with Ollama and Chai
    ```
 
 8. **Create embeddings and knowledge graph:**
+
    ```bash
    python -m graphrag index --root .
    ```
-9. **Start Lite-LLM proxy server:**
+
+9. **Query GraphRag with CLI**
+
    ```bash
-   litellm --model ollama_chat/llama3
+   python -m graphrag query --root . --method global --query "is there any recent trends that could impact the materials industry?"
    ```
-10. **Run app:**
+
+<!-- 10. **Start Lite-LLM proxy server:**
+
+```bash
+litellm --model ollama_chat/llama3
+```
+
+11. **Run app:**
     ```bash
     chainlit run appUI.py
-    ```
+    ``` -->
 
 ## For Jupyter Notebook Support
 
