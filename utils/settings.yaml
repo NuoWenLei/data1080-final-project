@@ -1,7 +1,7 @@
 encoding_model: cl100k_base
 skip_workflows: []
 llm:
-  api_key: <YOUR_API_KEY>
+  api_key: ${GRAPHRAG_API_KEY}
   type: openai_chat # or azure_openai_chat
   model: gpt-4o-mini
   model_supports_json: true # recommended if this is available for your model.
@@ -64,7 +64,7 @@ embeddings:
     # concurrent_requests: 25 # the number of parallel inflight requests that may be made
 
 chunks:
-  size: 300
+  size: 1200
   overlap: 100
   group_by_columns: [id] # by default, we don't allow chunks to cross documents
 
