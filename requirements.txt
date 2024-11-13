@@ -1,8 +1,7 @@
-litellm[proxy]
 ollama
-pyautogen[retrievechat]
+autogen-agentchat==0.4.0.dev6
+autogen-ext==0.4.0.dev6
 tiktoken
-chainlit
 graphrag
 marker-pdf
 torch
