@@ -11,9 +11,7 @@ Follow these steps to set up and run AutoGen GraphRAG Local with Ollama and Chai
    Visit [Ollama's website](https://ollama.com/) for installation files.
 
    ```bash
-   <!-- ollama pull mistral -->
    ollama pull nomic-embed-text
-   <!-- ollama pull llama3 -->
    ollama serve
    ```
 
