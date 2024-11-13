@@ -7,6 +7,7 @@ import pandas as pd
 import numpy as np
 import requests
 import datetime
+import requests_cache
 
 def get_tickers():
 	with open("tickers/tickers.json", "r") as tickers_json:
@@ -67,6 +68,9 @@ def get_ticker_info(symbol: str):
 											'totalCashPerShare', 'ebitda', 'totalDebt', 'quickRatio', 'currentRatio', 'totalRevenue', 'debtToEquity',
 											'revenuePerShare', 'returnOnAssets', 'returnOnEquity', 'freeCashflow', 'operatingCashflow', 'earningsGrowth',
 											'revenueGrowth', 'grossMargins', 'ebitdaMargins', 'operatingMargins', 'financialCurrency', 'trailingPegRatio']
+
+	session = requests_cache.CachedSession('yfinance.cache')
+	session.headers['User-agent'] = 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36'
 	ticker = yf.Ticker(symbol)
 	tickerInfo = ticker.info
 	tickerNumerics = dict()

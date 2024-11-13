@@ -12,4 +12,5 @@ markdownify
 ipython
 ipykernel
 notebook
+requests-cache
 
