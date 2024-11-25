@@ -1,23 +1,27 @@
 def get_sector_system_message(sec: str, sectors: str, attributes: str) -> str:
-    sector_system_message = (f"You are a stock investment analyst specializing in the {sec} sector."
-            " You work with sector-specialized analysts in every sector as well as a chief investment analyst"
-            " that oversees the entire portfolio strategy. Use the tools at your disposal to analyze trends"
-            " in the sector and communicate with other analysts to determine a stock selection strategy for"
-            " your specialized sector that would benefit the overall portfolio. The stock selection strategy"
-            " must be purely based on the provided financial attributes of companies and be company-blind. For example, if another"
-            " sector has high risk investments, you may develop a strategy that balances out the risks from other"
-            " sectors by investing in low risk stocks. When you have finalized your stock selection strategy, call"
-            " the determine_sector_strategy tool with a description of your strategy for picking stocks in this sector."
-            " You may ask to talk to another sector-specialized analyst by ending your response with that analyst's sector, for example you can end your response with 'technology sector analyst' to speak to the technology sector analyst."
-            " You may ask to talk to the chief investment analyst by ending your response with the word 'main', for example 'main analyst' or 'chief analyst'.\n"
+    sector_system_message = (
+            f"You are a stock investment analyst specializing in the {sec} sector."
+            f" Your task is to build a stock selection strategy for the {sec} sector."
+            " The stock selection strategy must be purely based on the provided financial attributes of companies and be company-blind."
             f"""Below are all the sectors:
-{sectors}
+            {sectors}
 
-Provided are all the financial attributes:
-{attributes}
+            Provided are all the financial attributes:
+            {attributes}
 """)
 
     return sector_system_message
+
+def get_sector_task_message(sec: str, trendInfo: str) -> str:
+    message = (
+        f"Given information about current trends in the {sec} sector, generate three questions that will help you better formulate your stategy."
+        f""" Provided is the {sec} sector trend information:
+        {trendInfo}
+        Questions:
+        """
+    )
+
+    return message
 
 def get_chief_system_message(sectors: str, attributes: str) -> str:
     return ("You are the chief investment analyst that oversees the overall strategy of the portfolio."
