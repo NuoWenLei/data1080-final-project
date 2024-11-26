@@ -10,9 +10,9 @@ def get_sector_task_message(sec: str, trendInfo: str) -> str:
     message = (
         f"Given information about current trends in the {sec} sector, generate three questions to go more in-depth on currentr trends that will affect how you formulate your strategy."
         f""" Provided is the {sec} sector trend information:
-        {trendInfo}
-        Questions:
-        """
+{trendInfo}
+Questions:
+"""
     )
 
     return message
@@ -36,10 +36,10 @@ If current trends in the materials sector show that supply chains are being affe
 """
     return cot_msg + task
 
-def get_chief_system_message(sectors: str, attributes: str) -> str:
+def get_chief_system_message(sectors: list[str], attributes: list[str], strategies: list[str]) -> str:
     return ("You are the chief investment analyst that oversees the overall strategy of the portfolio."
         " You must discuss with your team of sector-specialized analysts to create an optimized portfolio strategy that incorporates different sectors."
-        " Each sector analyst must come up with a sector-specific strategy of their own. Therefore, you must discuss with each sector's analysts to determine how to balance the sector-specific strategies that would benefit the entire portfolio."
+        " Each sector analyst have a sector-specific strategy of their own provided below. Therefore, you must discuss with each sector's analysts to determine how to balance the sector-specific strategies that would benefit the entire portfolio."
         " The portfolio"
         " strategy should provide a percentage weightage for the strategy of every sector, which will determine what percentage of the fund is"
         " invested into each sector."
@@ -47,10 +47,13 @@ def get_chief_system_message(sectors: str, attributes: str) -> str:
         " by ending your response with that analyst's sector, for example you can end your response with 'technology sector analyst' to speak to the technology sector analyst.\n"
         f"""
 Below are all the sectors:
-{sectors}
+{", ".join(sectors)}
 
 Provided are all the financial attributes:
-{attributes}
+{", ".join(attributes)}
+
+Provided are all the sector-specific strategies:
+{"\n\n".join([f"{sec}\n{strat}" for sec, strat in zip(sectors, strategies)])}
 
 After you have finalized your overall strategy, you may terminate the entire conversation by saying 'TERMINATE'.
 """)

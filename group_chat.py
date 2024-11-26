@@ -4,6 +4,7 @@ from autogen_agentchat.agents import AssistantAgent
 from autogen_agentchat.teams import SelectorGroupChat
 from autogen_agentchat.task import TextMentionTermination
 from dotenv import load_dotenv
+from answer_extractor import extractor
 from constants import SECTORS
 from system_messages import get_sector_system_message, get_chief_system_message
 from sector_chat import create_individual_strategy
@@ -203,13 +204,15 @@ async def main() -> None:
           system_message=get_sector_system_message(sec = sec))
       strategy = await create_individual_strategy(agent, query_rag, sec, attributes)
       sector_agents.append(agent)
-      sector_strategies.append(strategy)
+      sector_strategies.append(extractor(strategy))
     
+    print("SECTOR STRATEGIES")
+    print(sector_strategies)
     main_agent = AssistantAgent(
         "ChiefAnalyst",
         model_client,
         description="The chief investment analyst that oversees all sector-specific stock analysts",
-        system_message=get_chief_system_message(sectors = SECTORS, attributes = attributes)
+        system_message=get_chief_system_message(sectors = SECTORS, attributes = attributes, strategies=sector_strategies)
     )
 
     def selector_func(messages):
@@ -237,8 +240,13 @@ async def main() -> None:
     )
 
     stream = team.run_stream(task="Generate a robust multi-sector stock investment strategy based on global trends and the current U.S. market. main")
+    last_message = ""
     async for message in stream:
         print(message)
+        last_message = message
+    
+    determine_overall_strategy(last_message)
+
 
 
 asyncio.run(main())
