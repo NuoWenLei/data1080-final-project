@@ -1,20 +1,14 @@
-def get_sector_system_message(sec: str, sectors: str, attributes: str) -> str:
+def get_sector_system_message(sec: str) -> str:
     sector_system_message = (
             f"You are a stock investment analyst specializing in the {sec} sector."
             f" Your task is to build a stock selection strategy for the {sec} sector."
-            " The stock selection strategy must be purely based on the provided financial attributes of companies and be company-blind."
-            f"""Below are all the sectors:
-            {sectors}
-
-            Provided are all the financial attributes:
-            {attributes}
-""")
+            " The stock selection strategy must be purely based on the financial attributes of companies and be company-blind.")
 
     return sector_system_message
 
 def get_sector_task_message(sec: str, trendInfo: str) -> str:
     message = (
-        f"Given information about current trends in the {sec} sector, generate three questions that will help you better formulate your stategy."
+        f"Given information about current trends in the {sec} sector, generate three questions to go more in-depth on currentr trends that will affect how you formulate your strategy."
         f""" Provided is the {sec} sector trend information:
         {trendInfo}
         Questions:
@@ -22,6 +16,25 @@ def get_sector_task_message(sec: str, trendInfo: str) -> str:
     )
 
     return message
+
+"Assign numbers to describe its importance relative to the other attributes where the higher the number, the more important the attribute is. Use negative numbers for attributes that the strategy wants to minimize. Provided below are all the financial attributes."
+
+def get_sector_strategy_message(sec: str, rag_response: str, financial_attributes: list[str]) -> str:
+    cot_msg = get_chain_of_thought_message()
+    task = f"""Reason through the provided current trends in the {sec} sector and produce a list of financial attributes that can be used to select ideal companies to invest in in the {sec} sector.
+For each financial attribute mentioned, you must describe whether you want a company that maximizes or minimizes the attribute and describe relatively how important the attribute is to other mentioned attributes.
+Use the provided reasoning example as an example of how you want to consider recent news.
+
+Financial Attributes:
+{', '.join(financial_attributes)}    
+
+More info about current trends the RAG agent:
+{rag_response}
+
+Reasoning Example:
+If current trends in the materials sector show that supply chains are being affected, it is crucial to invest in companies with low debt-to-equity that are less reliant on debt and high quick ratio that can cover immediate liabilities without using inventory. It is also good to have high return on assets and return on equity as a metric of general financial health.
+"""
+    return cot_msg + task
 
 def get_chief_system_message(sectors: str, attributes: str) -> str:
     return ("You are the chief investment analyst that oversees the overall strategy of the portfolio."

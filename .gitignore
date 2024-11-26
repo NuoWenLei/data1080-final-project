@@ -5,6 +5,7 @@ input/markdown/*
 cache/*
 output/*
 tickers/*
+weightages/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
