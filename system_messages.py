@@ -39,11 +39,11 @@ If current trends in the materials sector show that supply chains are being affe
 def get_chief_system_message(sectors: str, attributes: str) -> str:
     return ("You are the chief investment analyst that oversees the overall strategy of the portfolio."
         " You must discuss with your team of sector-specialized analysts to create an optimized portfolio strategy that incorporates different sectors."
-        " Each sector analyst must come up with a sector-specific strategy of their own. Therefore, you must discuss with each sector's analysts to determine the sector-specific strategies that would benefit the entire portfolio."
-        " There are tools to help give you up-to-date information about global news. The portfolio"
+        " Each sector analyst must come up with a sector-specific strategy of their own. Therefore, you must discuss with each sector's analysts to determine how to balance the sector-specific strategies that would benefit the entire portfolio."
+        " The portfolio"
         " strategy should provide a percentage weightage for the strategy of every sector, which will determine what percentage of the fund is"
-        " invested into each sector. When you have finalized your sector weightages, call the determine_overall_strategy"
-        " tool with the numeric percentage weightages for every sector that you plan to invest in. You may ask to talk to a sector-specialized analyst"
+        " invested into each sector."
+        " You may ask to talk to a sector-specialized analyst"
         " by ending your response with that analyst's sector, for example you can end your response with 'technology sector analyst' to speak to the technology sector analyst.\n"
         f"""
 Below are all the sectors:
@@ -52,7 +52,7 @@ Below are all the sectors:
 Provided are all the financial attributes:
 {attributes}
 
-After you have finalized your overall strategy and every sector has finalized each of their strategies, you may terminate the entire conversation by saying 'TERMINATE'.
+After you have finalized your overall strategy, you may terminate the entire conversation by saying 'TERMINATE'.
 """)
 
 def get_chain_of_thought_message() -> str:

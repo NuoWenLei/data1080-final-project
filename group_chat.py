@@ -6,6 +6,7 @@ from autogen_agentchat.task import TextMentionTermination
 from dotenv import load_dotenv
 from constants import SECTORS
 from system_messages import get_sector_system_message, get_chief_system_message
+from sector_chat import create_individual_strategy
 # import tiktoken
 # from graphrag.query.structured_search.global_search.search import GlobalSearch
 # from graphrag.query.llm.oai.chat_openai import ChatOpenAI
@@ -19,7 +20,7 @@ def query_rag(query: str) -> str:
   """Queries the GraphRAG for up-to-date information."""
   # Capture the output of a command
   result = subprocess.run(["graphrag", "query", "--root", ".", "--method", "global", "--query", f'"{query}"'], capture_output=True, text=True)
-  return result
+  return "\n\n".join(result.stdout.strip().split("\n\n")[1:])
 # api_key = os.environ["GRAPHRAG_API_KEY"]
 # llm_model = "gpt-4o-mini"
 
@@ -192,19 +193,21 @@ async def main() -> None:
         sector_agent_names[sec.lower()] = f"{sec.replace(" ", "")}SectorAnalyst"
 
     sector_agents = []
+    sector_strategies = []
     for sec in SECTORS:
-        sector_agents.append(AssistantAgent(
-            f"{sec.replace(" ", "")}SectorAnalyst",
-            model_client,
-            tools=[query_rag, determine_investment_strategy(sec)], # TODO
-            description=f"A stock investment analyst specializing in the {sec} sector",
-            system_message=get_sector_system_message(sec = sec, sectors = SECTORS, attributes = attributes)
-        ))
+      print(f"{sec} SECTOR")
+      agent = AssistantAgent(
+          f"{sec.replace(" ", "")}SectorAnalyst",
+          model_client,
+          description=f"A stock investment analyst specializing in the {sec} sector",
+          system_message=get_sector_system_message(sec = sec))
+      strategy = await create_individual_strategy(agent, query_rag, sec, attributes)
+      sector_agents.append(agent)
+      sector_strategies.append(strategy)
     
     main_agent = AssistantAgent(
         "ChiefAnalyst",
         model_client,
-        tools=[query_rag, determine_overall_strategy],
         description="The chief investment analyst that oversees all sector-specific stock analysts",
         system_message=get_chief_system_message(sectors = SECTORS, attributes = attributes)
     )
