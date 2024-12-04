@@ -8,6 +8,7 @@ from answer_extractor import extractor
 from constants import SECTORS
 from system_messages import get_sector_system_message, get_chief_system_message
 from sector_chat import create_individual_strategy
+from portfolio_gen import generate_final_stock_portfolio
 # import tiktoken
 # from graphrag.query.structured_search.global_search.search import GlobalSearch
 # from graphrag.query.llm.oai.chat_openai import ChatOpenAI
@@ -246,6 +247,8 @@ async def main() -> None:
         last_message = message
     
     determine_overall_strategy(last_message)
+
+    generate_final_stock_portfolio()
 
 
 
