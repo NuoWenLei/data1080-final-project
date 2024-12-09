@@ -90,6 +90,18 @@ litellm --model ollama_chat/llama3
     ```bash
     chainlit run appUI.py
     ``` -->
+    
+10. **Run Portfolio Construction Script**
+
+   ```bash
+   python group_chat.py
+   ```
+
+11. **Check results at `weightages/`**
+
+    - `sectors/` contain financial attribute rankings for every sector.
+    - `overall_strategy.json` contains distribution of funds over sectors.
+    - `final_investments.json` contains the final investments into each stock for each sector.
 
 ## For Jupyter Notebook Support
 
