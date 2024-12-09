@@ -23,62 +23,7 @@ def query_rag(query: str) -> str:
   # Capture the output of a command
   result = subprocess.run(["graphrag", "query", "--root", ".", "--method", "global", "--query", f'"{query}"'], capture_output=True, text=True)
   return "\n\n".join(result.stdout.strip().split("\n\n")[1:])
-# api_key = os.environ["GRAPHRAG_API_KEY"]
-# llm_model = "gpt-4o-mini"
 
-# llm = ChatOpenAI(
-#     api_key=api_key,
-#     model=llm_model,
-#     api_type=OpenaiApiType.OpenAI,  # OpenaiApiType.OpenAI or OpenaiApiType.AzureOpenAI
-#     max_retries=10,
-# )
-
-# token_encoder = tiktoken.encoding_for_model(llm_model)
-
-# context_builder_params = {
-#     "use_community_summary": False,  # False means using full community reports. True means using community short summaries.
-#     "shuffle_data": True,
-#     "include_community_rank": True,
-#     "min_community_rank": 0,
-#     "community_rank_name": "rank",
-#     "include_community_weight": True,
-#     "community_weight_name": "occurrence weight",
-#     "normalize_community_weight": True,
-#     "max_tokens": 12_000,  # change this based on the token limit you have on your model (if you are using a model with 8k limit, a good setting could be 5000)
-#     "context_name": "Reports",
-# }
-
-# map_llm_params = {
-#     "max_tokens": 1000,
-#     "temperature": 0.0,
-#     "response_format": {"type": "json_object"},
-# }
-
-# reduce_llm_params = {
-#     "max_tokens": 2000,  # change this based on the token limit you have on your model (if you are using a model with 8k limit, a good setting could be 1000-1500)
-#     "temperature": 0.0,
-# }
-
-# context_builder = GlobalCommunityContext(
-#     community_reports=reports,
-#     communities=communities,
-#     entities=entities,  # default to None if you don't want to use community weights for ranking
-#     token_encoder=token_encoder,
-# )
-
-# search_engine = GlobalSearch(
-#     llm=llm,
-#     context_builder=context_builder,
-#     token_encoder=token_encoder,
-#     max_data_tokens=12_000,  # change this based on the token limit you have on your model (if you are using a model with 8k limit, a good setting could be 5000)
-#     map_llm_params=map_llm_params,
-#     reduce_llm_params=reduce_llm_params,
-#     allow_general_knowledge=False,  # set this to True will add instruction to encourage the LLM to incorporate general knowledge in the response, which may increase hallucinations, but could be useful in some use cases.
-#     json_mode=True,  # set this to False if your LLM model does not support JSON mode.
-#     context_builder_params=context_builder_params,
-#     concurrent_coroutines=32,
-#     response_type="multiple paragraphs",  # free form text describing the response type and format, can be anything, e.g. prioritized list, single paragraph, multiple paragraphs, multiple-page report
-# )
 
 def determine_investment_strategy(sector: str):
     def determine_sector_strategy(strategy: str) -> bool:
@@ -94,24 +39,23 @@ def determine_investment_strategy(sector: str):
                 "role": "user",
                 "content": "Convert the following strategy into a JSON dictionary that maps from financial attribute to a number describing its importance relative to the other attributes where the higher the number, the more important the attribute is. Use negative numbers for attributes that the strategy wants to minimize. Provided below are all the financial attributes, the strategy to be converted, and a sample response."
                 f"""
-    All Attributes:
-    {get_financial_attributes()}
+All Financial Attributes:
+{', '.join(get_financial_attributes())}
 
-    Strategy:
-    {strategy}
-    """
-    """
-    Sample Response:
-    {
-      "audit risk": 5,
-      "average volume 10days": 1,
-      "total debt": -8,
-      "earnings growth": 10,
-      "total cash per share": 3
-    }
+Strategy Discussion:
+{strategy}
+"""
+"""
+Sample Response:
+{
+  "audit risk": 5,
+  "total debt": -8,
+  "earnings growth": 10,
+  "total cash per share": 3
+}
 
-    Respond in JSON format and do not include anything else.
-    """
+Respond in JSON format and do not include anything else.
+"""
             }
         ])
 
@@ -122,8 +66,11 @@ def determine_investment_strategy(sector: str):
         json_dict = json_response[id1:id2 + 1]
         try:
             result = json.loads(json_dict)
+            new_result = dict()
+            for k in result:
+                new_result[k.lower()] = result[k]
             with open(f"weightages/sectors/{sector}_strategy.json", "w") as strategy_json:
-                json.dump(result, strategy_json)
+                json.dump(new_result, strategy_json)
             return True
         except Exception as e:
             print(e)
@@ -192,14 +139,14 @@ async def main() -> None:
         "chief": "ChiefAnalyst"
     }
     for sec in SECTORS:
-        sector_agent_names[sec.lower()] = f"{sec.replace(" ", "")}SectorAnalyst"
+        sector_agent_names[sec.lower()] = f"{sec.replace(' ', '')}SectorAnalyst"
 
     sector_agents = []
     sector_strategies = []
     for sec in SECTORS:
       print(f"{sec} SECTOR")
       agent = AssistantAgent(
-          f"{sec.replace(" ", "")}SectorAnalyst",
+          f"{sec.replace(' ', '')}SectorAnalyst",
           model_client,
           description=f"A stock investment analyst specializing in the {sec} sector",
           system_message=get_sector_system_message(sec = sec))
@@ -251,5 +198,5 @@ async def main() -> None:
     generate_final_stock_portfolio()
 
 
-
-asyncio.run(main())
+if __name__ == "__main__":
+  asyncio.run(main())
